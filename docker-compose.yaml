@@ -1,2 +1,34 @@
-version: 3
-
+version: '3'
+services:
+  nginx:
+    restart: always
+    build: ./nginx
+    ports:
+      - 8860:80
+    links:
+      - php
+    volumes:
+      - ./logs/nginx:/var/log/nginx
+      - ./cache/nginx:/var/cache/nginx
+      - ./wordpress:/usr/share/nginx/html
+  php:
+    restart: always
+    build: ./php7
+    links:
+      - db
+    volumes:
+      - ./logs/php-fpm:/var/log/php-fpm
+      - ./wordpress:/usr/share/nginx/html
+  db:
+    restart: always
+    image: mariadb:10.1
+    ports:
+      - 33066:3306
+    environment:
+      MYSQL_ROOT_PASSWORD: 123456
+      MYSQL_USER: user
+      MYSQL_PASSWORD: 123456
+      MYSQL_DATABASE: wordpress
+    volumes:
+      - ./mysql:/var/lib/mysql
+      - ./logs/mysql:/var/log/mysql
